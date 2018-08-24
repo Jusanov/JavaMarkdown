@@ -11,6 +11,11 @@ import java.io.OutputStreamWriter;
 
 public class JavaMarkdown {
 
+	static boolean pa = false;
+	static boolean it = false;
+	static boolean bo = false;
+	static boolean co = false;
+	
 	public static void main(String[] args) throws IOException {
 		
 		File mdDir = new File("Markdown/");
@@ -35,42 +40,15 @@ public class JavaMarkdown {
 				
 				// Line & Status info
 				String line;
-				boolean p = false;
 				
 				while ((line = markdown.readLine()) != null) {
 					
-					if (line.startsWith("#")) {
-						
-						int h = 0;
-						
-						for (char c : line.toCharArray()) if ((c + "").equalsIgnoreCase("#")) h++; else break;
-						
-						html.append("<h" + h + ">");
-						html.append(line.substring(h));
-						html.append("</h" + h + ">");
-						
-					} else if (line.startsWith("---")) html.append("<hr />");
-					else if(!line.isEmpty()) {
-						
-						if (p == false) {
-							p = true;
-							html.append("<p>");
-						}
-						
-						html.append(line);
-						
-					} else {
-						if (p == true) {
-							p = false;
-							html.append("</p>\n");
-						}
-					}
-					html.append("\n");
+					html.append(formatElements(line));
 					
 				}
 				
-				if (p == true) {
-					p = false;
+				if (pa == true) {
+					pa = false;
 					html.append("</p>\n");
 				}
 				
@@ -83,6 +61,90 @@ public class JavaMarkdown {
 			
 		}
 
+	}
+	
+	public static String formatElements(String line) {
+		
+		StringBuilder str = new StringBuilder();
+		
+		if (line.startsWith("#")) {
+			
+			int h = 0;
+			
+			for (char c : line.toCharArray()) if ((c + "").equalsIgnoreCase("#")) h++; else break;
+			
+			str.append("<h" + h + ">");
+			str.append(line.substring(h));
+			str.append("</h" + h + ">");
+			
+		} else if (line.startsWith("---")) str.append("<hr />");
+		else if(!line.isEmpty()) {
+			
+			if (pa == false) {
+				pa = true;
+				str.append("<p>");
+			}
+			
+			String par = "";
+			
+			char[] chars = line.toCharArray();
+			for (int i = 0; i < chars.length; i++) {
+				
+				char c = line.charAt(i);
+				
+				// Italic
+				if ((c + "").equalsIgnoreCase("_")) {
+					if (it == false) {
+						it = true;
+						par += "<em>";
+					} else if (it == true) {
+						it = false;
+						par += "</em>";
+					}
+				}
+				
+				// Bold
+				else if ((c + "").equalsIgnoreCase("*")) {
+					if ((line.charAt(i + 1) + "").equalsIgnoreCase("*")) {
+						i++;
+						if (bo == false) {
+							bo = true;
+							par += "<strong>";
+						} else if (bo == true) {
+							bo = false;
+							par += "</strong>";
+						}
+					}
+				}
+				
+				// Code
+				else if ((c + "").equalsIgnoreCase("`")) {
+					if (co == false) {
+						co = true;
+						par += "<code>";
+					} else if (co == true) {
+						co = false;
+						par += "</code>";
+					}
+				}
+				
+				// Normal handling
+				else par += c;
+				
+			}
+			
+			str.append(par);
+			
+		} else {
+			if (pa == true) {
+				pa = false;
+				str.append("</p>\n");
+			}
+		}
+		str.append("\n");
+		
+		return str.toString();
+		
 	}
 
 }
