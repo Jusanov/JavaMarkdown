@@ -15,6 +15,8 @@ public class JavaMarkdown {
 	static boolean it = false;
 	static boolean bo = false;
 	static boolean co = false;
+	static boolean ol = false;
+	static boolean ul = false;
 	
 	public static void main(String[] args) throws IOException {
 		
@@ -78,62 +80,55 @@ public class JavaMarkdown {
 			str.append("</h" + h + ">");
 			
 		} else if (line.startsWith("---")) str.append("<hr />");
-		else if(!line.isEmpty()) {
+		else if (line.startsWith("-") || line.startsWith("*")) {
+			
+			if (ul == false) {
+				ul = true;
+				str.append("<ul>\n");
+			}
+			if (line.charAt(1) == ' ') line = line.substring(2);
+			else line = line.substring(1);
+			
+			str.append("<li>" + formatText(line) + "</li>");
+			
+		} else if (line.charAt(1) == '.') {
+			
+			// The try/catch block is intended to make sure it is an actual numbered list
+			try {
+				
+				int num = Integer.parseInt(line.charAt(0) + "");
+				
+				if (ol == false) {
+					ol = true;
+					str.append("<ol>\n");
+				}
+				if (line.charAt(1) == ' ') line = line.substring(2);
+				else line = line.substring(1);
+				
+				str.append("<li>" + formatText(line) + "</li>");
+				
+			} catch (NumberFormatException e) {
+				
+			}
+			
+		} else if(!line.isEmpty()) {
+			
+			if (ul == true) {
+				ul = false;
+				str.append("</ul>\n");
+			}
+			
+			if (ol == true) {
+				ol = false;
+				str.append("</ol>\n");
+			}
 			
 			if (pa == false) {
 				pa = true;
 				str.append("<p>");
 			}
 			
-			String par = "";
-			
-			char[] chars = line.toCharArray();
-			for (int i = 0; i < chars.length; i++) {
-				
-				char c = line.charAt(i);
-				
-				// Italic
-				if ((c + "").equalsIgnoreCase("_")) {
-					if (it == false) {
-						it = true;
-						par += "<em>";
-					} else if (it == true) {
-						it = false;
-						par += "</em>";
-					}
-				}
-				
-				// Bold
-				else if ((c + "").equalsIgnoreCase("*")) {
-					if ((line.charAt(i + 1) + "").equalsIgnoreCase("*")) {
-						i++;
-						if (bo == false) {
-							bo = true;
-							par += "<strong>";
-						} else if (bo == true) {
-							bo = false;
-							par += "</strong>";
-						}
-					}
-				}
-				
-				// Code
-				else if ((c + "").equalsIgnoreCase("`")) {
-					if (co == false) {
-						co = true;
-						par += "<code>";
-					} else if (co == true) {
-						co = false;
-						par += "</code>";
-					}
-				}
-				
-				// Normal handling
-				else par += c;
-				
-			}
-			
-			str.append(par);
+			str.append(formatText(line));
 			
 		} else {
 			if (pa == true) {
@@ -144,6 +139,60 @@ public class JavaMarkdown {
 		str.append("\n");
 		
 		return str.toString();
+		
+	}
+	
+	public static String formatText(String text) {
+		
+		String par = "";
+		
+		char[] chars = text.toCharArray();
+		for (int i = 0; i < chars.length; i++) {
+			
+			char c = text.charAt(i);
+			
+			// Italic
+			if ((c + "").equalsIgnoreCase("_")) {
+				if (it == false) {
+					it = true;
+					par += "<em>";
+				} else if (it == true) {
+					it = false;
+					par += "</em>";
+				}
+			}
+			
+			// Bold
+			else if ((c + "").equalsIgnoreCase("*")) {
+				if ((text.charAt(i + 1) + "").equalsIgnoreCase("*")) {
+					i++;
+					if (bo == false) {
+						bo = true;
+						par += "<strong>";
+					} else if (bo == true) {
+						bo = false;
+						par += "</strong>";
+					}
+				}
+			}
+			
+			// Code
+			else if ((c + "").equalsIgnoreCase("`")) {
+				if (co == false) {
+					co = true;
+					par += "<code>";
+				} else if (co == true) {
+					co = false;
+					par += "</code>";
+				}
+			}
+			
+			// Normal handling
+			else par += c;
+			
+		}
+		
+		return par;
 		
 	}
 
