@@ -91,7 +91,7 @@ public class JavaMarkdown {
 			
 			str.append("<li>" + formatText(line) + "</li>");
 			
-		} else if (line.charAt(1) == '.') {
+		} else if (!line.isEmpty() && line.charAt(1) == '.') {
 			
 			// The try/catch block is intended to make sure it is an actual numbered list
 			try {
@@ -102,8 +102,8 @@ public class JavaMarkdown {
 					ol = true;
 					str.append("<ol>\n");
 				}
-				if (line.charAt(1) == ' ') line = line.substring(2);
-				else line = line.substring(1);
+				if (line.charAt(2) == ' ') line = line.substring(3);
+				else line = line.substring(2);
 				
 				str.append("<li>" + formatText(line) + "</li>");
 				
@@ -112,6 +112,15 @@ public class JavaMarkdown {
 			}
 			
 		} else if(!line.isEmpty()) {
+			
+			if (pa == false) {
+				pa = true;
+				str.append("<p>");
+			}
+			
+			str.append(formatText(line));
+			
+		} else {
 			
 			if (ul == true) {
 				ul = false;
@@ -123,18 +132,11 @@ public class JavaMarkdown {
 				str.append("</ol>\n");
 			}
 			
-			if (pa == false) {
-				pa = true;
-				str.append("<p>");
-			}
-			
-			str.append(formatText(line));
-			
-		} else {
 			if (pa == true) {
 				pa = false;
 				str.append("</p>\n");
 			}
+			
 		}
 		str.append("\n");
 		
