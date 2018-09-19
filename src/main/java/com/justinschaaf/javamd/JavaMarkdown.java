@@ -1,4 +1,4 @@
-package net.jusanov.javamd;
+package com.justinschaaf.javamd;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
